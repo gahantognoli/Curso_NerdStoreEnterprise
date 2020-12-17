@@ -1,7 +1,7 @@
-﻿using NSE.Core.DomainObjects;
-using System;
+﻿using System;
+using NSE.Core.DomainObjects;
 
-namespace NSE.Cliente.API.Models
+namespace NSE.Clientes.API.Models
 {
     public class Cliente : Entity, IAggregateRoot
     {
@@ -11,6 +11,7 @@ namespace NSE.Cliente.API.Models
         public bool Excluido { get; private set; }
         public Endereco Endereco { get; private set; }
 
+        // EF Relation
         protected Cliente() { }
 
         public Cliente(Guid id, string nome, string email, string cpf)

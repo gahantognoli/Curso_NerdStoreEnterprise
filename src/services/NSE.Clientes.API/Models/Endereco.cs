@@ -1,7 +1,7 @@
-﻿using NSE.Core.DomainObjects;
-using System;
+﻿using System;
+using NSE.Core.DomainObjects;
 
-namespace NSE.Cliente.API.Models
+namespace NSE.Clientes.API.Models
 {
     public class Endereco : Entity
     {
@@ -13,9 +13,9 @@ namespace NSE.Cliente.API.Models
         public string Cidade { get; private set; }
         public string Estado { get; private set; }
         public Guid ClienteId { get; private set; }
-        public Cliente Cliente { get; set; }
 
-        protected Endereco() { }
+        // EF Relation
+        public Cliente Cliente { get; protected set; }
 
         public Endereco(string logradouro, string numero, string complemento, string bairro, string cep, string cidade, string estado)
         {
