@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSE.MessageBus;
 using NSE.WebAPI.Core.Identidade;
 
 namespace NSE.Identidade.API.Configuration
@@ -10,7 +11,9 @@ namespace NSE.Identidade.API.Configuration
     {
         public static IServiceCollection AddApiConfiguration(this IServiceCollection services)
         {
-            services.AddControllers(); 
+            services.AddControllers();
+
+            services.AddMessageBus("host=localhost:5672");
 
             return services;
         }
