@@ -54,7 +54,7 @@ namespace NSE.Carrinho.API.Controllers
             var itemCarrinho = await ObterItemCarrinhoValidado(produtoId, carrinho, item);
             if (itemCarrinho == null) return CustomResponse();
 
-            carrinho.AtualizarUnidades(item, item.Quantidade);
+            carrinho.AtualizarUnidades(itemCarrinho, item.Quantidade);
 
             ValidarCarrinho(carrinho);
 

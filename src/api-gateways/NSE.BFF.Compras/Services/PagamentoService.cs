@@ -1,0 +1,18 @@
+﻿using Microsoft.Extensions.Options;
+using NSE.BFF.Compras.Extensions;
+using System;
+using System.Net.Http;
+
+namespace NSE.BFF.Compras.Services
+{
+    public class PagamentoService : Service, IPagamentoService
+    {
+        private readonly HttpClient _httpClient;
+
+        public PagamentoService(HttpClient httpClient, IOptions<AppServiceSettings> settings)
+        {
+            _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri(settings.Value.PagamentoUrl);
+        }
+    }
+}

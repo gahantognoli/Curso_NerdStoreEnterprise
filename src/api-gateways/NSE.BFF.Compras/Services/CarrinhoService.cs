@@ -1,32 +1,33 @@
 ﻿using Microsoft.Extensions.Options;
-using NSE.WebApp.MVC.Extensions;
-using NSE.WebApp.MVC.Models;
+using NSE.BFF.Compras.Extensions;
+using NSE.BFF.Compras.Models;
+using NSE.Core.Communication;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace NSE.WebApp.MVC.Services
+namespace NSE.BFF.Compras.Services
 {
     public class CarrinhoService : Service, ICarrinhoService
     {
         private readonly HttpClient _httpClient;
 
-        public CarrinhoService(HttpClient httpClient, IOptions<AppSettings> settings)
+        public CarrinhoService(HttpClient httpClient, IOptions<AppServiceSettings> settings)
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(settings.Value.CarrinhoUrl);
         }
 
-        public async Task<CarrinhoViewModel> ObterCarrinho()
+        public async Task<CarrinhoDTO> ObterCarrinho()
         {
             var response = await _httpClient.GetAsync("/carrinho/");
 
             TratarErrosResponse(response);
 
-            return await DeserializarObjetoResponse<CarrinhoViewModel>(response);
+            return await DeserializarObjetoResponse<CarrinhoDTO>(response);
         }
 
-        public async Task<ResponseResult> AdicionarItemCarrinho(ItemProdutoViewModel produto)
+        public async Task<ResponseResult> AdicionarItemCarrinho(ItemCarrinhoDTO produto)
         {
             var itemContent = ObterConteudo(produto);
 
@@ -37,7 +38,7 @@ namespace NSE.WebApp.MVC.Services
             return RetornoOk();
         }
 
-        public async Task<ResponseResult> AtualizarItemCarrinho(Guid produtoId, ItemProdutoViewModel produto)
+        public async Task<ResponseResult> AtualizarItemCarrinho(Guid produtoId, ItemCarrinhoDTO produto)
         {
             var itemContent = ObterConteudo(produto);
 
