@@ -19,11 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Commands\" />
-    <Folder Include="Application\Events\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\building blocks\NSE.WebAPI.Core\NSE.WebAPI.Core.csproj" />
     <ProjectReference Include="..\NSE.Pedido.Infra\NSE.Pedido.Infra.csproj" />
   </ItemGroup>
