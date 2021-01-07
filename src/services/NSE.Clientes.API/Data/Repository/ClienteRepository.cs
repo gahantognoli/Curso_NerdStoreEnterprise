@@ -19,19 +19,29 @@ namespace NSE.Clientes.API.Data.Repository
 
         public IUnitOfWork UnitOfWork => _context;
 
-        public async void Adicionar(Cliente cliente)
-        {
-            await _context.Clientes.AddAsync(cliente);
-        }
-
         public async Task<IEnumerable<Cliente>> ObterTodos()
         {
             return await _context.Clientes.AsNoTracking().ToListAsync();
         }
 
-        public async Task<Cliente> ObterPorCpf(string cpf)
+        public Task<Cliente> ObterPorCpf(string cpf)
         {
-            return await _context.Clientes.FirstOrDefaultAsync(c => c.Cpf.Numero == cpf);
+            return _context.Clientes.FirstOrDefaultAsync(c => c.Cpf.Numero == cpf);
+        }
+
+        public void Adicionar(Cliente cliente)
+        {
+            _context.Clientes.Add(cliente);
+        }
+
+        public async Task<Endereco> ObterEnderecoPorId(Guid id)
+        {
+            return await _context.Enderecos.FirstOrDefaultAsync(e => e.ClienteId == id);
+        }
+
+        public void AdicionarEndereco(Endereco endereco)
+        {
+            _context.Enderecos.Add(endereco);
         }
 
         public void Dispose()
