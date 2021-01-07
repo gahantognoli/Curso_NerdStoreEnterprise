@@ -25,5 +25,11 @@ namespace NSE.Catalogo.API.Controllers
         [ClaimsAuthorize("Catalogo", "Ler")]
         [HttpGet("catalogo/produtos/{id:guid}")]
         public async Task<Produto> ProdutoDetalhe(Guid id) => await _produtoRepository.ObterPorId(id);
+
+        [HttpGet("catalogo/produtos/lista/{ids}")]
+        public async Task<IEnumerable<Produto>> ObterProdutosPorId(string ids)
+        {
+            return await _produtoRepository.ObterProdutosPorId(ids);
+        }
     }
 }
