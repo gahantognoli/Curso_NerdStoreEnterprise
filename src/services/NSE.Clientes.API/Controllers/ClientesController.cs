@@ -24,7 +24,7 @@ namespace NSE.Clientes.API.Controllers
             _user = user;
         }
 
-        [HttpGet("cliente/endereco")]
+        [HttpGet("endereco")]
         public async Task<IActionResult> ObterEndereco()
         {
             var endereco = await _clienteRepository.ObterEnderecoPorId(_user.ObterUserId());
@@ -32,7 +32,7 @@ namespace NSE.Clientes.API.Controllers
             return endereco == null ? NotFound() : CustomResponse(endereco);
         }
 
-        [HttpPost("cliente/endereco")]
+        [HttpPost("endereco")]
         public async Task<IActionResult> AdicionarEndereco(AdicionarEnderecoCommand endereco)
         {
             endereco.ClienteId = _user.ObterUserId();

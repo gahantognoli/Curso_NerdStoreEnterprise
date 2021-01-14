@@ -1,6 +1,8 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using NSE.Core.Messages;
+using NSE.Core.Messages.Integration;
+using NSE.MessageBus;
 using NSE.Pedido.API.Application.DTO;
 using NSE.Pedido.API.Application.Events;
 using NSE.Pedido.Domain.Pedidos;
@@ -16,12 +18,14 @@ namespace NSE.Pedido.API.Application.Commands
     {
         private readonly IVoucherRepository _voucherRepository;
         private readonly IPedidoRepository _pedidoRepository;
+        private readonly IMessageBus _bus;
 
         public PedidoCommandHandler(IVoucherRepository voucherRepository,
-            IPedidoRepository pedidoRepository)
+            IPedidoRepository pedidoRepository, IMessageBus bus)
         {
             _voucherRepository = voucherRepository;
             _pedidoRepository = pedidoRepository;
+            _bus = bus;
         }
 
         public async Task<ValidationResult> Handle(AdicionarPedidoCommand message, CancellationToken cancellationToken)
@@ -34,7 +38,7 @@ namespace NSE.Pedido.API.Application.Commands
 
             if(!ValidarPedido(pedido)) return ValidationResult;
 
-            if (!ProcessarPagamento(pedido)) return ValidationResult;
+            if (!await ProcessarPagamento(pedido, message)) return ValidationResult;
 
             pedido.AutorizarPedido();
 
@@ -111,9 +115,30 @@ namespace NSE.Pedido.API.Application.Commands
             return true;
         }
 
-        private bool ProcessarPagamento(Domain.Pedidos.Pedido pedido)
+        private async Task<bool> ProcessarPagamento(Domain.Pedidos.Pedido pedido, AdicionarPedidoCommand message)
         {
-            return true;
+            var pedidoIniciado = new PedidoIniciadoIntegrationEvent
+            {
+                PedidoId = pedido.Id,
+                ClienteId = pedido.ClienteId,
+                Valor = pedido.ValorTotal,
+                TipoPagamento = 1, //fixo - cartão de crédito
+                NomeCartao = message.NomeCartao,
+                NumeroCartao = message.NumeroCartao,
+                MesAnoVencimento = message.ExpiracaoCartao,
+                CVV = message.CvvCartao
+            };
+
+            var result = await _bus.RequestAsync<PedidoIniciadoIntegrationEvent, ResponseMessage>(pedidoIniciado);
+
+            if (result.ValidationResult.IsValid) return true;
+
+            foreach (var erro in result.ValidationResult.Errors)
+            {
+                AdicionarErro(erro.ErrorMessage);
+            }
+
+            return false;
         }
     }
 }
