@@ -5,6 +5,7 @@
         Autorizado = 1,
         Pago,
         Negado,
-        Estornado
+        Estornado,
+        Cancelado
     }
 }

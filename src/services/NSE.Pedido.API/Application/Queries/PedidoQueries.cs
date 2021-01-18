@@ -42,6 +42,37 @@ namespace NSE.Pedido.API.Application.Queries
             return pedidos.Select(PedidoDTO.ParaPedidoDTO);
         }
 
+        public async Task<PedidoDTO> ObterPedidosAutorizados()
+        {
+            // Correção para pegar todos os itens do pedido e ordernar pelo pedido mais antigo
+            const string sql = @"SELECT 
+                                P.ID as 'PedidoId', P.ID, P.CLIENTEID, 
+                                PI.ID as 'PedidoItemId', PI.ID, PI.PRODUTOID, PI.QUANTIDADE 
+                                FROM PEDIDOS P 
+                                INNER JOIN PEDIDOITEMS PI ON P.ID = PI.PEDIDOID 
+                                WHERE P.PEDIDOSTATUS = 1                                
+                                ORDER BY P.DATACADASTRO";
+
+            // Utilizacao do lookup para manter o estado a cada ciclo de registro retornado
+            var lookup = new Dictionary<Guid, PedidoDTO>();
+
+            await _pedidoRepository.ObterConexao().QueryAsync<PedidoDTO, PedidoItemDTO, PedidoDTO>(sql,
+                (p, pi) =>
+                {
+                    if (!lookup.TryGetValue(p.Id, out var pedidoDTO))
+                        lookup.Add(p.Id, pedidoDTO = p);
+
+                    pedidoDTO.PedidoItems ??= new List<PedidoItemDTO>();
+                    pedidoDTO.PedidoItems.Add(pi);
+
+                    return pedidoDTO;
+
+                }, splitOn: "PedidoId,PedidoItemId");
+
+            // Obtendo dados o lookup
+            return lookup.Values.OrderBy(p => p.Data).FirstOrDefault();
+        }
+
         private PedidoDTO MapearPedido(dynamic result)
         {
             var pedido = new PedidoDTO
@@ -81,5 +112,6 @@ namespace NSE.Pedido.API.Application.Queries
             return pedido;
         }
 
+        
     }
 }

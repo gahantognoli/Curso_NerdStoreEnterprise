@@ -35,6 +35,16 @@ namespace NSE.Pedido.Domain.Pedidos
 
         protected Pedido() { }
 
+        public void CancelarPedido()
+        {
+            PedidoStatus = PedidoStatus.Cancelado;
+        }
+
+        public void FinalizarPedido()
+        {
+            PedidoStatus = PedidoStatus.Pago;
+        }
+
         public void AutorizarPedido()
         {
             PedidoStatus = PedidoStatus.Autorizado;

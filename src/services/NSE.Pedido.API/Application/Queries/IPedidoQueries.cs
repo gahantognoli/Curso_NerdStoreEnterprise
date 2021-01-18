@@ -10,5 +10,6 @@ namespace NSE.Pedido.API.Application.Queries
     {
         Task<PedidoDTO> ObterUltimoPedido(Guid clienteId);
         Task<IEnumerable<PedidoDTO>> ObterListaPorClienteId(Guid clienteId);
+        Task<PedidoDTO> ObterPedidosAutorizados();
     }
 }

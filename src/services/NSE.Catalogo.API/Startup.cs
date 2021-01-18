@@ -24,6 +24,8 @@ namespace NSE.Catalogo.API
 
             services.AddSwaggerConfiguration();
 
+            services.AddMessageBusConfiguration(Configuration);
+
             services.RegisterServices();
         }
 
