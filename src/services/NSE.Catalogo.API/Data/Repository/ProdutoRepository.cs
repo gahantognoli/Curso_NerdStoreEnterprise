@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using NSE.Catalogo.API.Models;
 using NSE.Core.DomainObjects.Data;
 using System;
@@ -20,7 +21,37 @@ namespace NSE.Catalogo.API.Data.Repository
             return await _context.Produtos.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Produto>> ObterTodos() => await _context.Produtos.AsNoTracking().ToListAsync();
+        public async Task<PagedResult<Produto>> ObterTodos(int pageSize, int pageIndex, string query = null)
+        {
+            //Paginação com entity framework
+            //return await _context.Produtos.AsNoTracking()
+            //   .Skip(pageSize * (pageIndex - 1)).Take(pageSize)
+            //   .Where(c => c.Nome.Contains(query)).ToListAsync();
+
+            //Paginação com Dapper
+            var sql = @$"SELECT * FROM Produtos 
+                       WHERE (@Nome IS NULL OR Nome LIKE '%' + @Nome + '%')
+                       ORDER BY [Nome]
+                       OFFSET {pageSize * (pageIndex - 1)} ROWS
+                       FETCH NEXT {pageSize} ROWS ONLY
+                       SELECT COUNT(Id) FROM Produtos
+                       WHERE (@Nome IS NULL OR Nome LIKE '%' + @Nome + '%')";
+
+            var multi = await _context.Database.GetDbConnection()
+                            .QueryMultipleAsync(sql, new { Nome = query });
+
+            var produtos = multi.Read<Produto>();
+            var total = multi.Read<int>().FirstOrDefault();
+
+            return new PagedResult<Produto>
+            {
+                List = produtos,
+                TotalResults = total,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Query = query
+            };
+        }
 
         public async Task<List<Produto>> ObterProdutosPorId(string ids)
         {
