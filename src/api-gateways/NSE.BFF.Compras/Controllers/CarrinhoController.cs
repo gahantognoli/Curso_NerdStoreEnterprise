@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NSE.BFF.Compras.Models;
 using NSE.BFF.Compras.Services;
+using NSE.BFF.Compras.Services.gRPC;
 using NSE.WebAPI.Core.Controllers;
 using System;
 using System.Linq;
@@ -15,13 +16,16 @@ namespace NSE.BFF.Compras.Controllers
         private readonly ICarrinhoService _carrinhoService;
         private readonly ICatalogoService _catalogoService;
         private readonly IPedidoService _pedidoService;
+        private readonly ICarrinhoGrpcService _carrinhoGrpcService;
 
-        public CarrinhoController(ICarrinhoService carrinhoService, 
-            ICatalogoService catalogoService, IPedidoService pedidoService)
+        public CarrinhoController(ICarrinhoService carrinhoService,
+            ICatalogoService catalogoService, IPedidoService pedidoService, 
+            ICarrinhoGrpcService carrinhoGrpcService)
         {
             _carrinhoService = carrinhoService;
             _catalogoService = catalogoService;
             _pedidoService = pedidoService;
+            _carrinhoGrpcService = carrinhoGrpcService;
         }
 
         [HttpGet]
